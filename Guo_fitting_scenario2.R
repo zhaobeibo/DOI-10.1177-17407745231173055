@@ -25,10 +25,11 @@ library(caret)
 name <- c("datas2")
 out.name <- c("fulls2_trt")
 
-data.dir <- data.dir.ext <- paste("//work//users//b//e//beibo//Research//paper2//",name,"//",sep="")
+data.dir <- data.dir.ext <- c("C://Users//CSCC//OneDrive - University of North Carolina at Chapel Hill//School//Research//thesis//Paper 2//datas2//")
+# data.dir <- data.dir.ext <- paste("//work//users//b//e//beibo//Research//paper2//",name,"//",sep="")
 out.dir <- paste("//work//users//b//e//beibo//Research//paper2//",out.name,"//",sep="")
 
-data.dir <- data.dir.ext <- c("C://Users//CSCC//OneDrive - University of North Carolina at Chapel Hill//School//Research//thesis//Paper 2//datas2//")
+
 
 
 
@@ -71,6 +72,37 @@ u.type <- 2
 gamma <- 0.5
 
 
+
+### matrix initialization ###
+## trt. are values when de-biasing is directly done on trt effect 
+## gamma. are values when de-biasing is done on utility 
+trt.eff.emp <- prev.emp <- gamma.emp <- bs.trt.sd <- rep(NA,S)
+prev.full <-  rep(NA,S)
+trt.eff.full.emp <-  trt.eff.full.emp.sd <- gamma.full.emp <-  gamma.full.emp.sd <- rep(NA,S)
+trt.eff.full.reg <-  trt.eff.full.reg.sd <- gamma.full.reg <-  gamma.full.reg.sd <- rep(NA,S)
+trt.eff.full.aug <-  trt.eff.full.aug.sd <- gamma.full.aug <-  gamma.full.aug.sd <- rep(NA,S)
+
+prev.full.ext <-  rep(NA,S)
+trt.eff.ext  <- rep(NA,S)
+gamma.ext <- rep(NA,S)
+
+prev.cv <-  rep(NA,S)
+trt.eff.cv.emp <-  gamma.cv.emp <-  rep(NA,S)
+trt.eff.cv.reg <-  gamma.cv.reg <-  rep(NA,S)
+trt.eff.cv.aug <-  gamma.cv.aug <-  rep(NA,S)
+gamma.cv.emp.sd <- gamma.cv.reg.sd <- gamma.cv.aug.sd <- rep(NA,S)
+trt.cv.emp.sd <- trt.cv.reg.sd <- trt.cv.aug.sd <- rep(NA,S)
+
+r.val <- trt.eff.guo <- trt.sd.guo <- gamma.guo <- gamma.sd.guo <- rep(NA,S)
+
+trt.eff.guo.reg <- gamma.guo.reg <- gamma.sd.guo.reg <- rep(NA,S)
+trt.eff.guo.aug <- gamma.guo.aug <- gamma.sd.guo.aug <- rep(NA,S)
+
+trt.guo.reg <- trt.sd.guo.reg <- rep(NA,S)
+trt.guo.aug <- trt.sd.guo.aug <- rep(NA,S)
+
+
+bs.trt.eff <- vector(mode = "list", length = S)
 
 
 
@@ -275,39 +307,7 @@ lm.cv <- function(n1.lm, cv.index, data.in) {
 
 
 
-
-
-### matrix initialization ###
-trt.eff.emp <- prev.emp <- gamma.emp <- bs.trt.sd <- rep(NA,S)
-prev.full <-  rep(NA,S)
-trt.eff.full.emp <-  trt.eff.full.emp.sd <- gamma.full.emp <-  gamma.full.emp.sd <- rep(NA,S)
-trt.eff.full.reg <-  trt.eff.full.reg.sd <- gamma.full.reg <-  gamma.full.reg.sd <- rep(NA,S)
-trt.eff.full.aug <-  trt.eff.full.aug.sd <- gamma.full.aug <-  gamma.full.aug.sd <- rep(NA,S)
-
-prev.full.ext <-  rep(NA,S)
-trt.eff.ext  <- rep(NA,S)
-gamma.ext <- rep(NA,S)
-
-prev.cv <-  rep(NA,S)
-trt.eff.cv.emp <-  gamma.cv.emp <-  rep(NA,S)
-trt.eff.cv.reg <-  gamma.cv.reg <-  rep(NA,S)
-trt.eff.cv.aug <-  gamma.cv.aug <-  rep(NA,S)
-gamma.cv.emp.sd <- gamma.cv.reg.sd <- gamma.cv.aug.sd <- rep(NA,S)
-trt.cv.emp.sd <- trt.cv.reg.sd <- trt.cv.aug.sd <- rep(NA,S)
-
-r.val <- trt.eff.guo <- trt.sd.guo <- gamma.guo <- gamma.sd.guo <- rep(NA,S)
-
-trt.eff.guo.reg <- gamma.guo.reg <- gamma.sd.guo.reg <- rep(NA,S)
-trt.eff.guo.aug <- gamma.guo.aug <- gamma.sd.guo.aug <- rep(NA,S)
-
-trt.guo.reg <- trt.sd.guo.reg <- rep(NA,S)
-trt.guo.aug <- trt.sd.guo.aug <- rep(NA,S)
-
-
-bs.trt.eff <- vector(mode = "list", length = S)
-
-
-
+### MAIN ###
 
 for(s in 1:S)
 {
@@ -484,7 +484,7 @@ for(s in 1:S)
 
     ## Zhang, done separately, missing here just as placeholder ##
     
-    fold.index <- createFolds(d[,1], k = fold.num.cv, list = TRUE, returnTrain = FALSE)
+    # fold.index <- createFolds(d[,1], k = fold.num.cv, list = TRUE, returnTrain = FALSE)
     
     gamma.j.zhang.emp <- gamma.j.zhang.reg <- gamma.j.zhang.aug <-rep(NA, fold.num.cv)
     trt.j.zhang.emp <- trt.j.zhang.reg <- trt.j.zhang.aug <- rep(NA, fold.num.cv)
@@ -520,7 +520,7 @@ for(s in 1:S)
       }
       ind.sub.t.b <- ind.sub.b[d$t[ind.sub.b] == 1]
       ind.sub.c.b <- ind.sub.b[d$t[ind.sub.b] == 0]
-      trt.eff.b <- mean(d[ind.sub.t.b,1]) - mean(d[ind.sub.c.b,1])
+      trt.eff.b <- mean(d$V1[ind.sub.t.b]) - mean(d$V1[ind.sub.c.b])
       prev.b <- (length(ind.sub.b))/n1
 
         beta.b[s.b] <- trt.eff.b*(prev.b)^gamma
@@ -528,8 +528,8 @@ for(s in 1:S)
         beta.b.trt[s.b] <- trt.eff.b
 
     }
-    gamma.guo.emp <- max(beta.b+d.c.emp, na.rm = TRUE)
-    trt.guo.emp <- max(beta.b.trt+d.c.emp.trt, na.rm = TRUE)
+    gamma.guo.emp <- max(sum(beta.b+d.c.emp, na.rm = TRUE), na.rm = TRUE)
+    trt.guo.emp <- max(sum(beta.b.trt+d.c.emp.trt, na.rm = TRUE), na.rm = TRUE)
     
     
     # regression
@@ -549,8 +549,8 @@ for(s in 1:S)
 
       beta.b.trt <- trt.eff.b
 
-    gamma.guo.reg <- max(beta.b+d.c.reg, na.rm = TRUE)
-    trt.guo.reg <- max(beta.b.trt+d.c.reg.trt, na.rm = TRUE)
+    gamma.guo.reg <- max(sum(beta.b+d.c.reg,na.rm = TRUE), na.rm = TRUE)
+    trt.guo.reg <- max(sum(beta.b.trt+d.c.reg.trt,na.rm = TRUE), na.rm = TRUE)
     
     
     
@@ -587,8 +587,8 @@ for(s in 1:S)
 
       beta.b.trt <- trt.eff.aug.diff
 
-    gamma.guo.aug <- max(beta.b+d.c.aug, na.rm = TRUE)
-    trt.guo.aug <- max(beta.b.trt+d.c.aug.trt, na.rm = TRUE)
+    gamma.guo.aug <- max(sum(beta.b+d.c.aug,na.rm = TRUE), na.rm = TRUE)
+    trt.guo.aug <- max(sum(beta.b.trt+d.c.aug.trt,na.rm = TRUE), na.rm = TRUE)
     
     out.guo <- c(gamma.guo.emp,gamma.guo.reg,gamma.guo.aug,
                  trt.guo.emp, trt.guo.reg, trt.guo.aug)
@@ -650,8 +650,8 @@ for(s in 1:S)
   # tuning parameter
   r.seq <- seq(0.05,0.45,0.05)
   h.i.j.r.min <- rep(NA, length(r.seq))
-  gamma.max <- max(as.numeric(u.data.full$u.utility))
-  trt.max <- max(as.numeric(u.data.full$u.trt.diff))
+  gamma.max <- max(as.numeric(u.data.full$u.utility),na.rm = TRUE)
+  trt.max <- max(as.numeric(u.data.full$u.trt.diff),na.rm = TRUE)
   
   for (m in 1:length(r.seq)) {
     
@@ -730,10 +730,10 @@ for(s in 1:S)
   
   
   # empirical #
-  gamma.max.emp <-  max(as.numeric(u.data.full$u.utility))
+  gamma.max.emp <-  max(as.numeric(u.data.full$u.utility),na.rm = TRUE)
   d.c.emp <- (1-n1^(r-0.5))*(gamma.max.emp - as.numeric(u.data.full$u.utility))
   
-  trt.max.emp <-  max(as.numeric(u.data.full$u.trt.diff))
+  trt.max.emp <-  max(as.numeric(u.data.full$u.trt.diff),na.rm = TRUE)
   d.c.emp.trt <- (1-n1^(r-0.5))*(trt.max.emp - as.numeric(u.data.full$u.trt.diff))
   
   # regression  ##
@@ -745,10 +745,10 @@ for(s in 1:S)
     trt.g.sub[u] <- (mean(signif(as.matrix(full.b[(cv.full[[3]][[u]]),-c(1:2)]) %*% 
                                    as.matrix(fit.beta.full), digits = 8)))
   }
-  gamma.max.reg <-  max(gamma.g.sub) # max regression estimated trt effect, then resulting utility
+  gamma.max.reg <-  max(gamma.g.sub,na.rm = TRUE) # max regression estimated trt effect, then resulting utility
   d.c.reg <- (1-n1^(r-0.5))*(gamma.max.reg - as.numeric(u.data.full$u.utility))
   
-  trt.max.reg <-  max(trt.g.sub)
+  trt.max.reg <-  max(trt.g.sub,na.rm = TRUE)
   d.c.reg.trt <- (1-n1^(r-0.5))*(trt.max.reg - as.numeric(u.data.full$u.trt.diff))
   
   
@@ -778,11 +778,11 @@ for(s in 1:S)
       sum((gamma.g.sub.c[[u]]*{(d$t==0)-(length(ind.sub.c.full)/length(ind.sub.full))})[ind.sub.full]) / length(ind.sub.c.full)
   }
   gamma.g.sub <- (unlist(gamma.g.sub.aug.t) - unlist(gamma.g.sub.aug.c))*(as.numeric(u.data.full$u.prev))^gamma 
-  gamma.max.aug <- gamma.max <- max(gamma.g.sub)
+  gamma.max.aug <- gamma.max <- max(gamma.g.sub,na.rm = TRUE)
   d.c.aug <- (1-n1^(r-0.5))*(gamma.max - as.numeric(u.data.full$u.utility))
   
   trt.g.sub <- (unlist(gamma.g.sub.aug.t) - unlist(gamma.g.sub.aug.c))
-  trt.max.aug <-  max(trt.g.sub)
+  trt.max.aug <-  max(trt.g.sub,na.rm = TRUE)
   d.c.aug.trt <- (1-n1^(r-0.5))*(trt.max.aug - as.numeric(u.data.full$u.trt.diff))
   
   
